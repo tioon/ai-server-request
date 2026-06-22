@@ -18,6 +18,8 @@ const vendorGrid = document.querySelector("#vendorGrid");
 const copyButton = document.querySelector("#copyButton");
 const gpuPowerValue = document.querySelector("#gpuPowerValue");
 const gpuConnectorValue = document.querySelector("#gpuConnectorValue");
+const gpuExactnessValue = document.querySelector("#gpuExactnessValue");
+const gpuRequiredPartsValue = document.querySelector("#gpuRequiredPartsValue");
 const STORAGE_KEY = "ai-server-request-state";
 
 const WORKLOADS = {
@@ -128,6 +130,25 @@ const GPU_OPTIONS = [
     },
     fit: "inference, light tuning",
     note: "현재 데이터센터에서 가장 많이 보는 축"
+  },
+  {
+    value: "L40",
+    label: "L40",
+    cpu: "2-socket, 32-48 cores",
+    memory: "256GB-512GB",
+    platforms: ["PCIe"],
+    variants: {
+      PCIe: {
+        tdp: "300W",
+        connector: "1x 16-pin",
+        exactness: "official reference",
+        serverNeed: "PCIe chassis with a 16-pin GPU lead",
+        psu: "2 x 1600W",
+        requiredParts: "16-pin GPU power cable"
+      }
+    },
+    fit: "graphics, visual AI, inference",
+    note: "L40S보다 조금 덜 공격적인 범용 Ada 계열"
   },
   {
     value: "A2",
@@ -323,6 +344,25 @@ const GPU_OPTIONS = [
     },
     fit: "next-gen training",
     note: "차세대 랙 전력 예산 필요"
+  },
+  {
+    value: "B300",
+    label: "B300 / Blackwell",
+    cpu: "high-core 2-socket+",
+    memory: "1TB-2TB",
+    platforms: ["SXM"],
+    variants: {
+      SXM: {
+        tdp: "platform-specific",
+        connector: "HGX baseboard / SXM",
+        exactness: "platform-specific",
+        serverNeed: "HGX Blackwell platform with matching SXM baseboard",
+        psu: "2 x 3000W",
+        requiredParts: "HGX Blackwell baseboard"
+      }
+    },
+    fit: "next-gen training",
+    note: "Blackwell 세대의 SXM 기준"
   }
 ];
 
@@ -332,7 +372,7 @@ const VENDORS = [
     model: "ProLiant DL380 Gen11",
     badge: "balanced enterprise",
     summary: "범용 AI 인프라와 추론형 서비스에 잘 맞는 2U 기준선.",
-    fit: ["L4", "L40S", "A10", "A40"],
+    fit: ["L4", "L40", "L40S", "A10", "A40"],
     platforms: ["PCIe"],
     accent: ["#6ee7ff", "#10263b"],
     specs: {
@@ -348,7 +388,7 @@ const VENDORS = [
     model: "ProLiant DL385 Gen11",
     badge: "AMD GPU-friendly",
     summary: "PCIe 여유와 확장성이 좋아 GPU 수량이 늘어날수록 편함.",
-    fit: ["L40S", "A100", "H100"],
+    fit: ["L40", "L40S", "A100", "H100"],
     platforms: ["PCIe"],
     accent: ["#8cffc1", "#0d2d23"],
     specs: {
@@ -364,7 +404,7 @@ const VENDORS = [
     model: "PowerEdge R760",
     badge: "general-purpose",
     summary: "추론, 혼합, 운영형 AI에서 가장 무난한 기준점.",
-    fit: ["RTX6000Ada", "L4", "L40S", "A10"],
+    fit: ["RTX6000Ada", "L4", "L40", "L40S", "A10"],
     platforms: ["PCIe"],
     accent: ["#ffb86b", "#33210e"],
     specs: {
@@ -380,7 +420,7 @@ const VENDORS = [
     model: "PowerEdge XE9680",
     badge: "training flagship",
     summary: "고밀도 GPU 학습과 큰 전력 예산에 맞는 플래그십.",
-    fit: ["A100", "H100", "H200", "B200"],
+    fit: ["A100", "H100", "H200", "B200", "B300"],
     platforms: ["PCIe", "SXM"],
     accent: ["#ff8bb1", "#331127"],
     specs: {
@@ -501,10 +541,12 @@ function estimatedLoad(workloadKey, gpu, gpuCount, siteType, gpuPlatform) {
     T4: [0.35, 0.6],
     A30: [0.8, 1.1],
     A40: [0.9, 1.2],
+    L40: [1.0, 1.3],
     A100: [1.6, 2.4],
     H100: [2.0, 3.0],
     H200: [2.4, 3.6],
-    B200: [3.0, 4.2]
+    B200: [3.0, 4.2],
+    B300: [3.0, 4.2]
   }[gpu.value] || [1.0, 1.2];
 
   const platformLoadAdj = gpuPlatform === "SXM" ? 0.45 : 0;
@@ -516,12 +558,14 @@ function estimatedLoad(workloadKey, gpu, gpuCount, siteType, gpuPlatform) {
 
 function powerBand(loadHigh, gpu, gpuPlatform) {
   if (gpu.value === "B200" || (gpu.value === "H200" && gpuPlatform === "SXM")) return "2 x 3000W";
+  if (gpu.value === "B300") return "HGX power shelf / 2 x 3000W";
   if (gpu.value === "H100" && gpuPlatform === "SXM") return "HGX power shelf / 2 x 3000W";
   if (gpu.value === "H100" && gpuPlatform === "PCIe") return "2 x 2000W";
   if (gpu.value === "H200" && gpuPlatform === "PCIe") return "2 x 3000W";
   if (gpu.value === "A100" && gpuPlatform === "SXM") return "HGX power shelf / 2 x 3000W";
   if (gpu.value === "A100" && gpuPlatform === "PCIe") return "2 x 2000W";
   if (gpu.value === "L40S") return "2 x 1600W";
+  if (gpu.value === "L40") return "2 x 1600W";
   if (gpu.value === "L4" || gpu.value === "RTX6000Ada" || gpu.value === "A10" || gpu.value === "A40") return loadHigh <= 1.0 ? "2 x 1200W" : "2 x 1600W";
   if (gpu.value === "A2" || gpu.value === "T4") return "2 x 800W";
   return loadHigh <= 1.0 ? "2 x 1200W" : "2 x 1600W";
@@ -707,6 +751,8 @@ function render() {
   psuValue.textContent = state.psuText;
   gpuPowerValue.textContent = state.gpuPower;
   gpuConnectorValue.textContent = state.gpuConnector;
+  gpuExactnessValue.textContent = state.gpuExactness;
+  gpuRequiredPartsValue.textContent = state.gpuRequiredParts;
   supportValue.textContent = state.support;
 
   livePreview.textContent = [
