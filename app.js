@@ -96,7 +96,7 @@ const GPU_OPTIONS = [
   {
     value: "L4",
     label: "L4",
-    cpu: "2-socket, 16-32 cores",
+    cpu: "1-socket, 8-16 cores",
     memory: "192GB-384GB",
     platforms: ["PCIe"],
     variants: {
@@ -115,7 +115,7 @@ const GPU_OPTIONS = [
   {
     value: "L40S",
     label: "L40S",
-    cpu: "2-socket, 32-48 cores",
+    cpu: "1-socket, 16-24 cores",
     memory: "256GB-512GB",
     platforms: ["PCIe"],
     variants: {
@@ -134,7 +134,7 @@ const GPU_OPTIONS = [
   {
     value: "L40",
     label: "L40",
-    cpu: "2-socket, 32-48 cores",
+    cpu: "1-socket, 16-24 cores",
     memory: "256GB-512GB",
     platforms: ["PCIe"],
     variants: {
@@ -153,7 +153,7 @@ const GPU_OPTIONS = [
   {
     value: "A2",
     label: "A2",
-    cpu: "2-socket, 16-24 cores",
+    cpu: "1-socket, 8-12 cores",
     memory: "128GB-256GB",
     platforms: ["PCIe"],
     variants: {
@@ -172,7 +172,7 @@ const GPU_OPTIONS = [
   {
     value: "A10",
     label: "A10",
-    cpu: "2-socket, 16-32 cores",
+    cpu: "1-socket, 12-24 cores",
     memory: "128GB-256GB",
     platforms: ["PCIe"],
     variants: {
@@ -191,7 +191,7 @@ const GPU_OPTIONS = [
   {
     value: "T4",
     label: "T4",
-    cpu: "2-socket, 16-24 cores",
+    cpu: "1-socket, 8-12 cores",
     memory: "128GB-256GB",
     platforms: ["PCIe"],
     variants: {
@@ -210,7 +210,7 @@ const GPU_OPTIONS = [
   {
     value: "A30",
     label: "A30",
-    cpu: "2-socket, 24-32 cores",
+    cpu: "1-socket, 16-24 cores",
     memory: "256GB-384GB",
     platforms: ["PCIe"],
     variants: {
@@ -229,7 +229,7 @@ const GPU_OPTIONS = [
   {
     value: "A40",
     label: "A40",
-    cpu: "2-socket, 24-32 cores",
+    cpu: "1-socket or 2-socket, 16-32 cores",
     memory: "256GB-384GB",
     platforms: ["PCIe"],
     variants: {
@@ -248,7 +248,7 @@ const GPU_OPTIONS = [
   {
     value: "A100",
     label: "A100",
-    cpu: "2-socket, 48-64 cores",
+    cpu: "2-socket, 32-64 cores",
     memory: "512GB-1TB",
     platforms: ["PCIe", "SXM"],
     variants: {
@@ -275,7 +275,7 @@ const GPU_OPTIONS = [
   {
     value: "H100",
     label: "H100",
-    cpu: "2-socket, 48-64 cores",
+    cpu: "2-socket, 32-64 cores",
     memory: "512GB-1TB",
     platforms: ["PCIe", "SXM"],
     variants: {
@@ -302,7 +302,7 @@ const GPU_OPTIONS = [
   {
     value: "H200",
     label: "H200",
-    cpu: "high-core 2-socket+",
+    cpu: "2-socket, 48-64+ cores",
     memory: "1TB-2TB",
     platforms: ["PCIe", "SXM"],
     variants: {
@@ -329,7 +329,7 @@ const GPU_OPTIONS = [
   {
     value: "B200",
     label: "B200 / Blackwell",
-    cpu: "high-core 2-socket+",
+    cpu: "2-socket, 48-96+ cores",
     memory: "1TB-2TB",
     platforms: ["SXM"],
     variants: {
@@ -348,7 +348,7 @@ const GPU_OPTIONS = [
   {
     value: "B300",
     label: "B300 / Blackwell",
-    cpu: "high-core 2-socket+",
+    cpu: "2-socket, 48-96+ cores",
     memory: "1TB-2TB",
     platforms: ["SXM"],
     variants: {
@@ -369,11 +369,46 @@ const GPU_OPTIONS = [
 const VENDORS = [
   {
     vendor: "HPE",
+    model: "ProLiant DL360 Gen11",
+    badge: "compact inference",
+    summary: "저전력 GPU와 단일 소켓 구성에 잘 맞는 1U 기준선.",
+    fit: ["A2", "T4", "L4", "RTX6000Ada"],
+    platforms: ["PCIe"],
+    capacityLevel: 1,
+    accent: ["#5cc9ff", "#0e2136"],
+    specs: {
+      formFactor: "1U single/dual-socket",
+      pcie: "PCIe Gen5 compact expansion",
+      gpuClass: "entry inference / low-profile GPU",
+      power: "Best when you want density without oversized chassis",
+      serverNeed: "Good fit for low-power or low-profile PCIe GPUs"
+    }
+  },
+  {
+    vendor: "Dell",
+    model: "PowerEdge R660",
+    badge: "efficient rack server",
+    summary: "L4, A2, T4 같은 저전력 GPU에 맞는 효율적인 1U/2U 중간 지점.",
+    fit: ["A2", "T4", "L4", "RTX6000Ada", "A10"],
+    platforms: ["PCIe"],
+    capacityLevel: 1,
+    accent: ["#67f0c7", "#0b2a1d"],
+    specs: {
+      formFactor: "1U dual-socket",
+      pcie: "PCIe Gen5 efficient expansion",
+      gpuClass: "compact inference / service nodes",
+      power: "Better when you do not need a large 2U GPU chassis",
+      serverNeed: "Good for low-to-mid power PCIe GPU deployments"
+    }
+  },
+  {
+    vendor: "HPE",
     model: "ProLiant DL380 Gen11",
     badge: "balanced enterprise",
     summary: "범용 AI 인프라와 추론형 서비스에 잘 맞는 2U 기준선.",
     fit: ["L4", "L40", "L40S", "A10", "A40"],
     platforms: ["PCIe"],
+    capacityLevel: 2,
     accent: ["#6ee7ff", "#10263b"],
     specs: {
       formFactor: "2U dual-socket",
@@ -390,6 +425,7 @@ const VENDORS = [
     summary: "PCIe 여유와 확장성이 좋아 GPU 수량이 늘어날수록 편함.",
     fit: ["L40", "L40S", "A100", "H100"],
     platforms: ["PCIe"],
+    capacityLevel: 3,
     accent: ["#8cffc1", "#0d2d23"],
     specs: {
       formFactor: "2U dual-socket",
@@ -406,6 +442,7 @@ const VENDORS = [
     summary: "추론, 혼합, 운영형 AI에서 가장 무난한 기준점.",
     fit: ["RTX6000Ada", "L4", "L40", "L40S", "A10"],
     platforms: ["PCIe"],
+    capacityLevel: 2,
     accent: ["#ffb86b", "#33210e"],
     specs: {
       formFactor: "2U dual-socket",
@@ -422,6 +459,7 @@ const VENDORS = [
     summary: "고밀도 GPU 학습과 큰 전력 예산에 맞는 플래그십.",
     fit: ["A100", "H100", "H200", "B200", "B300"],
     platforms: ["PCIe", "SXM"],
+    capacityLevel: 4,
     accent: ["#ff8bb1", "#331127"],
     specs: {
       formFactor: "4U GPU server",
@@ -445,6 +483,112 @@ const LEGACY_GPU_ALIASES = {
 
 function getGpuVariant(gpu, platform) {
   return gpu.variants?.[platform] || gpu.variants?.[gpu.platforms?.[0]] || {};
+}
+
+function getGpuDemandLevel(gpuValue) {
+  return {
+    A2: 1,
+    T4: 1,
+    L4: 1,
+    RTX6000Ada: 2,
+    A10: 2,
+    A30: 2,
+    L40: 2,
+    L40S: 3,
+    A40: 3,
+    A100: 4,
+    H100: 4,
+    H200: 5,
+    B200: 6,
+    B300: 6
+  }[gpuValue] || 2;
+}
+
+function resolveCpuSpec(gpu, gpuCount, workloadKey) {
+  const profiles = {
+    L4: {
+      1: "1-socket, 8-12 cores",
+      2: "1-socket, 12-16 cores",
+      4: "1-socket or 2-socket, 16-24 cores",
+      8: "2-socket, 24-32 cores"
+    },
+    L40: {
+      1: "1-socket, 16-24 cores",
+      2: "1-socket or 2-socket, 16-24 cores",
+      4: "2-socket, 24-32 cores",
+      8: "2-socket, 32-48 cores"
+    },
+    L40S: {
+      1: "1-socket, 16-24 cores",
+      2: "1-socket or 2-socket, 16-24 cores",
+      4: "2-socket, 24-32 cores",
+      8: "2-socket, 32-48 cores"
+    },
+    RTX6000Ada: {
+      1: "1-socket, 16-24 cores",
+      2: "1-socket or 2-socket, 16-24 cores",
+      4: "2-socket, 24-32 cores",
+      8: "2-socket, 32-48 cores"
+    },
+    A10: {
+      1: "1-socket, 12-24 cores",
+      2: "1-socket or 2-socket, 16-24 cores",
+      4: "2-socket, 24-32 cores",
+      8: "2-socket, 32-48 cores"
+    },
+    A30: {
+      1: "1-socket, 16-24 cores",
+      2: "1-socket or 2-socket, 16-24 cores",
+      4: "2-socket, 24-32 cores",
+      8: "2-socket, 32-48 cores"
+    },
+    A40: {
+      1: "1-socket or 2-socket, 16-32 cores",
+      2: "2-socket, 16-32 cores",
+      4: "2-socket, 24-32 cores",
+      8: "2-socket, 32-48 cores"
+    },
+    A100: {
+      1: "2-socket, 32-48 cores",
+      2: "2-socket, 32-64 cores",
+      4: "2-socket, 48-64 cores",
+      8: "2-socket, 64+ cores"
+    },
+    H100: {
+      1: "2-socket, 32-48 cores",
+      2: "2-socket, 32-64 cores",
+      4: "2-socket, 48-64 cores",
+      8: "2-socket, 64+ cores"
+    },
+    H200: {
+      1: "2-socket, 48-64 cores",
+      2: "2-socket, 48-64+ cores",
+      4: "2-socket, 64+ cores",
+      8: "2-socket, 64+ cores"
+    },
+    B200: {
+      1: "2-socket, 48-96+ cores",
+      2: "2-socket, 64+ cores",
+      4: "2-socket, 64+ cores",
+      8: "2-socket, 64+ cores"
+    },
+    B300: {
+      1: "2-socket, 48-96+ cores",
+      2: "2-socket, 64+ cores",
+      4: "2-socket, 64+ cores",
+      8: "2-socket, 64+ cores"
+    }
+  };
+
+  const countBucket = gpuCount >= 8 ? 8 : gpuCount >= 4 ? 4 : gpuCount >= 2 ? 2 : 1;
+  const baseProfile = profiles[gpu.value]?.[countBucket];
+  if (baseProfile) {
+    return workloadKey === "training" && (gpu.value === "A100" || gpu.value === "H100" || gpu.value === "H200" || gpu.value === "B200" || gpu.value === "B300")
+      ? `${baseProfile} (train-friendly)`
+      : baseProfile;
+  }
+
+  return gpu.cpu;
 }
 
 function getDefaultGpuValue(platform) {
@@ -632,7 +776,10 @@ function makeVendorCard(vendor, state) {
   const card = document.createElement("article");
   card.className = "card vendor-card";
   const supportsPlatform = vendor.platforms?.includes(state.gpuPlatform) ?? true;
-  const score = (vendor.fit.includes(state.gpu.value) ? 3 : 0) + (supportsPlatform ? 2 : 0);
+  const demandLevel = getGpuDemandLevel(state.gpu.value);
+  const capacityLevel = vendor.capacityLevel || 2;
+  const capacityScore = Math.max(0, 4 - Math.abs(capacityLevel - demandLevel));
+  const score = (vendor.fit.includes(state.gpu.value) ? 4 : 0) + (supportsPlatform ? 2 : 0) + capacityScore;
   const fallback = fallbackSvg(vendor.vendor, vendor.model, vendor.accent[0], vendor.accent[1]);
   const fitReason = vendor.fit.includes(state.gpu.value)
     ? `현재 선택한 ${state.gpu.label} / ${state.gpuPlatform}와 맞습니다.`
@@ -719,6 +866,7 @@ function render() {
   const load = estimatedLoad(workloadKey, gpu, gpuCount, siteType, gpuPlatform);
   const powerBandText = powerBand(load[1], gpu, gpuPlatform);
   const siteLabel = siteType === "datacenter" ? "데이터센터" : siteType === "office" ? "오피스/서버실" : "엣지/분산 설치";
+  const cpuSpec = resolveCpuSpec(gpu, gpuCount, workloadKey);
 
   const state = {
     workload,
@@ -727,7 +875,7 @@ function render() {
     gpuVariant,
     gpuCount,
     siteLabel,
-    cpu: gpu.cpu,
+    cpu: cpuSpec,
     memory: workloadKey === "training" && gpu.memory !== "1TB-2TB" ? "512GB-1TB" : gpu.memory,
     storage: workload.storage,
     network: siteType === "office" ? "10/25GbE x1" : siteType === "edge" ? "10GbE x1" : workload.network,
@@ -758,6 +906,7 @@ function render() {
   livePreview.textContent = [
     `워크로드: ${state.workload.label}`,
     `GPU: ${state.gpu.label} / ${state.gpuPlatform} x${state.gpuCount}`,
+    `CPU: ${state.cpu}`,
     `GPU 전력: ${state.gpuPower}`,
     `GPU 커넥터: ${state.gpuConnector}`,
     `필수 부품: ${state.gpuRequiredParts}`,
@@ -774,8 +923,9 @@ function render() {
       vendor,
       index,
       score:
-        (vendor.fit.includes(state.gpu.value) ? 3 : 0) +
+        (vendor.fit.includes(state.gpu.value) ? 4 : 0) +
         ((vendor.platforms?.includes(state.gpuPlatform) ?? true) ? 2 : 0) +
+        Math.max(0, 4 - Math.abs((vendor.capacityLevel || 2) - getGpuDemandLevel(state.gpu.value))) +
         (vendor.vendor === "Dell" && state.gpu.value === "H100" && state.gpuPlatform === "PCIe" ? 1 : 0)
     }))
     .sort((a, b) => b.score - a.score || a.index - b.index);
